@@ -90,6 +90,11 @@ test "Make sure readNote draws correct note" {
 	assert $result == $expected
 }
 
+test "Make sure readNote sets idx" {
+	readNote 1
+	assert $::idx == 1
+}
+
 set testFileContent {
 Test Stuff File
 ________________
@@ -146,6 +151,34 @@ test "Make sure serializeStuff works" {
 	set expected [join [list \
 		[join {{Test Stuff File}} \n] \
 		[join {{First Note} bla {}} \n] \
+		[join {{Second Note} {} {bla bla}} \n] \
+		[join {{Third Note} {} {bla bla bla}} \n] \
+	] "\n[string repeat _ 80]\n\n"]
+	assert $txt == "$expected\n[string repeat _ 80]\n\n"
+}
+
+test "Make sure newNote works" {
+	readNote 2
+	newNote
+	assert $::idx == none
+	
+	set result [$::notebox get 0.0 end]
+	assert [string trim $result] == ""
+}
+
+test "Make sure serializeStuff saves modified notes" {
+	global txt
+	
+	readNote 1
+	$::notebox insert end mango
+	
+	set txt ""
+	set dummyFile [chan create write stringWriteChan]
+	serializeStuff $dummyFile
+	chan close $dummyFile
+	set expected [join [list \
+		[join {{Test Stuff File}} \n] \
+		[join {{First Note} bla mango} \n] \
 		[join {{Second Note} {} {bla bla}} \n] \
 		[join {{Third Note} {} {bla bla bla}} \n] \
 	] "\n[string repeat _ 80]\n\n"]

@@ -79,7 +79,17 @@ proc loadStuff {} {
 }
 
 proc serializeStuff {chan} {
-	global stuff
+	global stuff idx
+
+	if {$idx != "none"} {
+		if {$idx < [llength $stuff]} {
+			lset stuff $idx 1 [lrange [
+				split [$::notebox get 0.0 end] \n
+			] 0 end-1]
+		} else {
+		
+		}
+	}
 
 	foreach note $stuff {
 		puts $chan [join [lindex $note 1] \n]
@@ -95,6 +105,12 @@ proc readNote {i} {
 	$::notebox insert end [join [
 		lindex $stuff $i 1
 	] \n]
+}
+
+proc newNote {} {
+	global idx
+	$::notebox delete 0.0 end
+	set idx none
 }
 
 proc parseStuff {chan} {
