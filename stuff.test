@@ -47,18 +47,13 @@ proc stringReadChan {cmd args} {
 
 proc stringWriteChan {cmd args} {
 	global txt
-	puts $cmd
 	switch -- $cmd {
 		write {
 			set data [lindex $args 1]
 			append txt $data
-			puts "> $data"
-			puts "< $txt"
-			exit
 			return [string length $data]
 		}
 		initialize {
-			puts $args
 			return {initialize finalize watch write}
 		}
 	}
@@ -117,7 +112,7 @@ test "Make sure parseStuff works as expected" {
 	set ::txt $::testFileContent
 	set dummyFile [chan create read stringReadChan]	
 	parseStuff $dummyFile
-	close $dummyFile
+	chan close $dummyFile
 	
 	set expected {
 		{0 {{Test Stuff File}}}
@@ -142,14 +137,19 @@ test "readNote should work with output of parseStuff" {
 	assert $result == $expected
 }
 
-test "Make sure saveStuff works" {
+test "Make sure serializeStuff works" {
 	global txt
 	set txt ""
 	set dummyFile [chan create write stringWriteChan]
-	saveStuff $dummyFile
-	#close $dummyFile
-	set expected [regsub -all -lineanchor {^____+$} $::testFileContent [string repeat _ 80]]
-	assert $txt == $expected
+	serializeStuff $dummyFile
+	chan close $dummyFile
+	set expected [join [list \
+		[join {{Test Stuff File}} \n] \
+		[join {{First Note} bla {}} \n] \
+		[join {{Second Note} {} {bla bla}} \n] \
+		[join {{Third Note} {} {bla bla bla}} \n] \
+	] "\n[string repeat _ 80]\n\n"]
+	assert $txt == "$expected\n[string repeat _ 80]\n\n"
 }
 
 exit

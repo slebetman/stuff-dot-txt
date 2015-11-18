@@ -61,13 +61,23 @@ proc searchStuff {} {}
 proc newNote {} {}
 proc deleteNote {} {}
 
-proc saveStuff {chan} {
+proc saveStuff {} {
+	set f [open ~/bin/stuff.txt w]
+	serializeStuff $f
+	close $f
+}
+
+proc loadStuff {} {
+	set f [open ~/bin/stuff.txt]
+	parseStuff $f
+	close $f
+	drawStuff
+}
+
+proc serializeStuff {chan} {
 	global stuff
 
 	foreach note $stuff {
-		puts $chan
-		puts $note
-		exit
 		puts $chan [join [lindex $note 1] \n]
 		puts $chan "[string repeat _ 80]\n"
 	}
@@ -101,3 +111,4 @@ proc parseStuff {chan} {
 	}
 }
 
+loadStuff
