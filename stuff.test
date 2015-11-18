@@ -208,4 +208,50 @@ test "Make sure serializeStuff saves new note" {
 	assert [lindex $stuff end 1] == "mango"
 }
 
+test "Make sure deleteNote works" {
+	global stuff idx
+
+	readNote 4
+	deleteNote
+	assert [string trim [$::notebox get 0.0 end]] == ""
+	assert $::idx == "none"
+	assert [lindex $stuff 4 0] == "deleted"
+}
+
+test "Make sure deleteNote redraw notes list correctly" {
+	set ::txt $::testFileContent
+	set dummyFile [chan create read stringReadChan]	
+	parseStuff $dummyFile
+	chan close $dummyFile
+	
+	readNote 2
+	deleteNote
+	
+	set expected "First Note\nThird Note\n\n"
+	set result [$::listbox get 0.0 end]
+	assert $result == $expected
+}
+
+test "Make sure deleted notes are not serialized" {
+	set ::txt $::testFileContent
+	set dummyFile [chan create read stringReadChan]	
+	parseStuff $dummyFile
+	chan close $dummyFile
+	
+	readNote 2
+	deleteNote
+	
+	set ::txt ""
+	set dummyFile [chan create write stringWriteChan]
+	serializeStuff $dummyFile
+	chan close $dummyFile
+	
+	set expected [join [list \
+		[join {{Test Stuff File}} \n] \
+		[join {{First Note} bla {}} \n] \
+		[join {{Third Note} {} {bla bla bla}} \n] \
+	] "\n[string repeat _ 80]\n\n"]
+	assert $::txt == "$expected\n[string repeat _ 80]\n\n"
+}
+
 exit
