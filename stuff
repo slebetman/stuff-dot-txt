@@ -63,7 +63,11 @@ proc drawStuff {{select all}} {
 	$::listbox configure -state disabled
 }
 
-proc searchStuff {} {}
+proc searchStuff {} {
+	global stuff searchterm
+	
+	drawStuff [lsearch -nocase -regexp -all $stuff $searchterm]
+}
 
 proc deleteNote {} {
 	global idx stuff

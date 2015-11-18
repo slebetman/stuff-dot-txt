@@ -254,4 +254,24 @@ test "Make sure deleted notes are not serialized" {
 	assert $::txt == "$expected\n[string repeat _ 80]\n\n"
 }
 
+test "Make sure searchStuff works" {
+	global stuff searchterm
+	set searchterm mango
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} Mango bla}}
+		{deleted {{Second Note} {super mango} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+		{4 {{The mango files} {bla bla}}}
+	}
+	
+	drawStuff
+	searchStuff
+	
+	set expected "First Note\nThe mango files\n\n"
+	set result [$::listbox get 0.0 end]
+	assert $result == $expected
+}
+
 exit
