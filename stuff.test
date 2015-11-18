@@ -1,0 +1,55 @@
+#! /usr/bin/env tclsh
+
+package require Tk
+
+set TESTING 1
+set TERMINAL [expr {![catch {fconfigure stdout -mode}]}]
+
+proc color {txt c} {
+	if {$::TERMINAL} {
+		puts -nonewline "\033\[3${c}m$txt\033\[0m"
+	} else {
+		puts -nonewline $txt
+	}
+}
+
+proc test {description script} {
+	if {[catch $script]} {
+		puts "[color FAIL 1]: $description\n[regsub -lineanchor -all ^ $::errorInfo \t]"
+	} else {
+		puts "[color PASS 2]: $description"
+	}
+}
+
+proc fail {e r} {
+	foreach var {e r} {
+		set $var [string map {\n \\n \t \\t} [set $var]]
+	}
+	error "Expected: \"$e\", Result: \"$r\""
+}
+
+test "Parsing code" {
+	uplevel #0 {source stuff}
+}
+
+test "Make sure drawStuff draws correct list" {
+	set ::stuff {
+		1 {
+			{Hello World}
+			{this is a note}
+		}
+		2 {
+			{Second Note}
+			{this is another note}
+		}
+	}
+	drawStuff
+	set expected "Hello World\nSecond Note\n"
+	set result [$::listbox get 0.0 end]
+	
+	if {$result != $expected} {
+		fail $expected $result
+	}
+}
+
+exit

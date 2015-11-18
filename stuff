@@ -30,6 +30,10 @@ pack [set notebox [text .bottom.right.note \
 pack [set notescroll [ttk::scrollbar .bottom.right.scroll -command {$::notebox yview}]] \
 	-side left -fill y
 
+proc drawStuff {{select all}} {
+	
+}
+
 proc searchStuff {} {}
 proc newNote {} {}
 proc deleteNote {} {}
