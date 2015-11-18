@@ -30,6 +30,40 @@ proc assert {r op e} {
 	error "Expected: \"$e\", Result: \"$r\""
 }
 
+proc stringReadChan {cmd args} {
+	global txt
+	switch -- $cmd {
+		read {
+			set len [lindex $args 1]
+			set ret [string range $txt 0 $len-1]
+			set txt [string range $txt $len end]
+			return $ret
+		}
+		initialize {
+			return {initialize finalize watch read}
+		}
+	}
+}
+
+proc stringWriteChan {cmd args} {
+	global txt
+	puts $cmd
+	switch -- $cmd {
+		write {
+			set data [lindex $args 1]
+			append txt $data
+			puts "> $data"
+			puts "< $txt"
+			exit
+			return [string length $data]
+		}
+		initialize {
+			puts $args
+			return {initialize finalize watch write}
+		}
+	}
+}
+
 test "Parsing code" {
 	uplevel #0 {source stuff}
 }
@@ -61,8 +95,7 @@ test "Make sure readNote draws correct note" {
 	assert $result == $expected
 }
 
-test "Make sure parseStuff works as expected" {
-set ::txt {
+set testFileContent {
 Test Stuff File
 ________________
 First Note
@@ -80,22 +113,12 @@ bla bla bla
 __________________
 }
 
-	proc stringChan {cmd args} {
-		switch $cmd {
-			read {
-				set len [lindex $args 1]
-				set ret [string range $::txt 0 $len-1]
-				set ::txt [string range $::txt $len end]
-				return $ret
-			}
-			initialize {
-				return {initialize finalize watch read}
-			}
-		}
-	}
-	set dummyFile [chan create read stringChan]
-	
+test "Make sure parseStuff works as expected" {
+	set ::txt $::testFileContent
+	set dummyFile [chan create read stringReadChan]	
 	parseStuff $dummyFile
+	close $dummyFile
+	
 	set expected {
 		{0 {{Test Stuff File}}}
 		{1 {{First Note} bla {}}}
@@ -105,7 +128,7 @@ __________________
 	assert [list {*}$::stuff] == [list {*}$expected]
 }
 
-test "drawStuff should work with output of parseStuff" {	
+test "drawStuff should work with output of parseStuff" {
 	drawStuff
 	set expected "First Note\nSecond Note\nThird Note\n\n"
 	set result [$::listbox get 0.0 end]
@@ -117,6 +140,16 @@ test "readNote should work with output of parseStuff" {
 	set expected "Second Note\n\nbla bla\n"
 	set result [$::notebox get 0.0 end]
 	assert $result == $expected
+}
+
+test "Make sure saveStuff works" {
+	global txt
+	set txt ""
+	set dummyFile [chan create write stringWriteChan]
+	saveStuff $dummyFile
+	#close $dummyFile
+	set expected [regsub -all -lineanchor {^____+$} $::testFileContent [string repeat _ 80]]
+	assert $txt == $expected
 }
 
 exit

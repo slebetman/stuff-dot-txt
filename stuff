@@ -60,7 +60,18 @@ proc drawStuff {{select all}} {
 proc searchStuff {} {}
 proc newNote {} {}
 proc deleteNote {} {}
-proc saveStuff {} {}
+
+proc saveStuff {chan} {
+	global stuff
+
+	foreach note $stuff {
+		puts $chan
+		puts $note
+		exit
+		puts $chan [join [lindex $note 1] \n]
+		puts $chan "[string repeat _ 80]\n"
+	}
+}
 
 proc readNote {i} {
 	global stuff idx
