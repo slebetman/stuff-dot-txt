@@ -35,17 +35,9 @@ test "Parsing code" {
 }
 
 set stuff {
-	{0 {
-		{Title of stuff.txt file}
-	}}
-	{1 {
-		{Hello World}
-		{this is a note}
-	}}
-	{2 {
-		{Second Note}
-		{this is another note}
-	}}
+	{0 {{Title of stuff.txt file}}}
+	{1 {{Hello World} {this is a note}}}
+	{2 {{Second Note} {this is another note}}}
 }
 
 test "Make sure drawStuff draws correct list" {
@@ -65,6 +57,64 @@ test "Make sure drawStuff draw selected notes correctly" {
 test "Make sure readNote draws correct note" {
 	readNote 2
 	set expected "Second Note\nthis is another note\n"
+	set result [$::notebox get 0.0 end]
+	assert $result == $expected
+}
+
+test "Make sure parseStuff works as expected" {
+set ::txt {
+Test Stuff File
+________________
+First Note
+bla
+
+________________
+
+Second Note
+
+bla bla
+_____________
+Third Note
+
+bla bla bla
+__________________
+}
+
+	proc stringChan {cmd args} {
+		switch $cmd {
+			read {
+				set len [lindex $args 1]
+				set ret [string range $::txt 0 $len-1]
+				set ::txt [string range $::txt $len end]
+				return $ret
+			}
+			initialize {
+				return {initialize finalize watch read}
+			}
+		}
+	}
+	set dummyFile [chan create read stringChan]
+	
+	parseStuff $dummyFile
+	set expected {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
+	assert [list {*}$::stuff] == [list {*}$expected]
+}
+
+test "drawStuff should work with output of parseStuff" {	
+	drawStuff
+	set expected "First Note\nSecond Note\nThird Note\n\n"
+	set result [$::listbox get 0.0 end]
+	assert $result == $expected
+}
+
+test "readNote should work with output of parseStuff" {
+	readNote 2
+	set expected "Second Note\n\nbla bla\n"
 	set result [$::notebox get 0.0 end]
 	assert $result == $expected
 }

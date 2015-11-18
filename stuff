@@ -1,7 +1,7 @@
 #! /usr/bin/env wish
 
 set searchterm ""
-set stuff ""
+set stuff {}
 set idx none
 
 pack [ttk::frame .top] -fill x
@@ -61,5 +61,23 @@ proc readNote {i} {
 	$::notebox insert end [join [
 		lindex $stuff $i 1
 	] \n]
+}
+
+proc parseStuff {chan} {
+	global stuff idx
+	set stuff {}
+	set idx none
+	
+	set i 0
+	set note {}
+	while {[gets $chan line] >= 0} {
+		if {[regexp {^____+\s*$} $line]} {
+			lappend stuff [list $i $note]
+			set note {}
+			incr i
+		} elseif {[llength $note] || [regexp {\S} $line]} {
+			lappend note $line
+		}
+	}
 }
 
