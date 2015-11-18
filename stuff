@@ -1,0 +1,36 @@
+#! /usr/bin/env wish
+
+set searchterm ""
+set stuff ""
+set idx none
+
+pack [ttk::frame .top] -fill x
+pack [ttk::frame .bottom] -fill both -expand true
+pack [ttk::frame .bottom.left] -side left -fill y
+pack [ttk::frame .bottom.right] -side right -fill both -expand true
+
+pack [ttk::label .top.l -text Search] -side left
+pack [set searchbox [ttk::entry .top.search -textvariable searchterm]] \
+	-side left -fill x -expand true
+bind $searchbox <KeyRelease> searchStuff
+pack [ttk::button .top.new -text "New" -command newNote] -side left
+pack [ttk::button .top.delete -text "Delete" -command deleteNote] -side left
+pack [ttk::button .top.save -text "Save" -command saveStuff] -side left
+
+pack [set listbox [text .bottom.left.list -width 30 -yscrollcommand {$::listscroll set}]] \
+	-side left -fill y
+pack [set listscroll [ttk::scrollbar .bottom.left.scroll -command {$::listbox yview}]] \
+	-side left -fill y
+
+pack [set notebox [text .bottom.right.note \
+	-width 80 \
+	-yscrollcommand {$::notescroll set} \
+	-highlightthickness 0
+]] -side left -fill both -expand 1
+pack [set notescroll [ttk::scrollbar .bottom.right.scroll -command {$::notebox yview}]] \
+	-side left -fill y
+
+proc searchStuff {} {}
+proc newNote {} {}
+proc deleteNote {} {}
+proc saveStuff {} {}
