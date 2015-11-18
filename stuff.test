@@ -185,4 +185,27 @@ test "Make sure serializeStuff saves modified notes" {
 	assert $txt == "$expected\n[string repeat _ 80]\n\n"
 }
 
+test "Make sure serializeStuff saves new note" {
+	global stuff txt
+	
+	newNote
+	update
+	$::notebox insert end mango
+	update
+	
+	set txt ""
+	set dummyFile [chan create write stringWriteChan]
+	serializeStuff $dummyFile
+	chan close $dummyFile
+	set expected [join [list \
+		[join {{Test Stuff File}} \n] \
+		[join {{First Note} bla mango} \n] \
+		[join {{Second Note} {} {bla bla}} \n] \
+		[join {{Third Note} {} {bla bla bla}} \n] \
+		[join {{mango}} \n]
+	] "\n[string repeat _ 80]\n\n"]
+	assert $txt == "$expected\n[string repeat _ 80]\n\n"
+	assert [lindex $stuff end 1] == "mango"
+}
+
 exit
