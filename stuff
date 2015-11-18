@@ -34,10 +34,15 @@ proc drawStuff {{select all}} {
 	global stuff
 
 	$::listbox configure -state normal
+	$::listbox delete 0.0 end
 	for {set i 1} {$i < [llength $stuff]} {incr i} {
 		if {$i > 0 && ($select == "all" || [lsearch -integer -sorted $select $i] >= 0)} {
 			set note [lindex $stuff $i]
-			$::listbox insert end "[lindex $note 1 0]\n"
+			$::listbox insert end "[lindex $note 1 0]\n" $i
+			$::listbox tag configure $i -foreground blue
+			$::listbox tag bind $i <Enter> [list $::listbox tag configure $i -foreground red]
+			$::listbox tag bind $i <Leave> [list $::listbox tag configure $i -foreground blue]
+			$::listbox tag bind $i <Button-1> [list readNote $i]
 		}
 	}
 	$::listbox configure -state disabled
@@ -47,3 +52,14 @@ proc searchStuff {} {}
 proc newNote {} {}
 proc deleteNote {} {}
 proc saveStuff {} {}
+
+proc readNote {i} {
+	global stuff idx
+	set idx $i
+	
+	$::notebox delete 0.0 end
+	$::notebox insert end [join [
+		lindex $stuff $i 1
+	] \n]
+}
+

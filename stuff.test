@@ -21,7 +21,9 @@ proc test {description script} {
 	}
 }
 
-proc fail {e r} {
+proc assert {r op e} {
+	if "\$r $op \$e" return
+	
 	foreach var {e r} {
 		set $var [string map {\n \\n \t \\t} [set $var]]
 	}
@@ -32,27 +34,39 @@ test "Parsing code" {
 	uplevel #0 {source stuff}
 }
 
+set stuff {
+	{0 {
+		{Title of stuff.txt file}
+	}}
+	{1 {
+		{Hello World}
+		{this is a note}
+	}}
+	{2 {
+		{Second Note}
+		{this is another note}
+	}}
+}
+
 test "Make sure drawStuff draws correct list" {
-	set ::stuff {
-		{0 {
-			{Title of stuff.txt file}
-		}}
-		{1 {
-			{Hello World}
-			{this is a note}
-		}}
-		{2 {
-			{Second Note}
-			{this is another note}
-		}}
-	}
 	drawStuff
 	set expected "Hello World\nSecond Note\n\n"
 	set result [$::listbox get 0.0 end]
-	
-	if {$result != $expected} {
-		fail $expected $result
-	}
+	assert $result == $expected
+}
+
+test "Make sure drawStuff draw selected notes correctly" {
+	drawStuff {0 2}
+	set expected "Second Note\n\n"
+	set result [$::listbox get 0.0 end]
+	assert $result == $expected
+}
+
+test "Make sure readNote draws correct note" {
+	readNote 2
+	set expected "Second Note\nthis is another note\n"
+	set result [$::notebox get 0.0 end]
+	assert $result == $expected
 }
 
 exit
