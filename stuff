@@ -113,6 +113,8 @@ proc serializeStuff {chan} {
 			puts $chan "[string repeat _ 80]\n"
 		}
 	}
+	
+	drawStuff
 }
 
 proc readNote {i} {

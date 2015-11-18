@@ -189,9 +189,8 @@ test "Make sure serializeStuff saves new note" {
 	global stuff txt
 	
 	newNote
-	update
 	$::notebox insert end mango
-	update
+	$::listbox delete 0.0 end
 	
 	set txt ""
 	set dummyFile [chan create write stringWriteChan]
@@ -206,6 +205,7 @@ test "Make sure serializeStuff saves new note" {
 	] "\n[string repeat _ 80]\n\n"]
 	assert $txt == "$expected\n[string repeat _ 80]\n\n"
 	assert [lindex $stuff end 1] == "mango"
+	assert [lindex [split [string trim [$::listbox get 0.0 end]] \n] end] == mango
 }
 
 test "Make sure deleteNote works" {
