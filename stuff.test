@@ -6,7 +6,7 @@ set TESTING 1
 set TERMINAL [expr {![catch {fconfigure stdout -mode}]}]
 
 proc color {txt c} {
-	if {$::TERMINAL} {
+	if {$::TERMINAL || $::argv == "--color"} {
 		puts -nonewline "\033\[3${c}m$txt\033\[0m"
 	} else {
 		puts -nonewline $txt
