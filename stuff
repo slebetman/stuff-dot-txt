@@ -31,7 +31,16 @@ pack [set notescroll [ttk::scrollbar .bottom.right.scroll -command {$::notebox y
 	-side left -fill y
 
 proc drawStuff {{select all}} {
-	
+	global stuff
+
+	$::listbox configure -state normal
+	for {set i 1} {$i < [llength $stuff]} {incr i} {
+		if {$i > 0 && ($select == "all" || [lsearch -integer -sorted $select $i] >= 0)} {
+			set note [lindex $stuff $i]
+			$::listbox insert end "[lindex $note 1 0]\n"
+		}
+	}
+	$::listbox configure -state disabled
 }
 
 proc searchStuff {} {}

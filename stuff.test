@@ -34,17 +34,20 @@ test "Parsing code" {
 
 test "Make sure drawStuff draws correct list" {
 	set ::stuff {
-		1 {
+		{0 {
+			{Title of stuff.txt file}
+		}}
+		{1 {
 			{Hello World}
 			{this is a note}
-		}
-		2 {
+		}}
+		{2 {
 			{Second Note}
 			{this is another note}
-		}
+		}}
 	}
 	drawStuff
-	set expected "Hello World\nSecond Note\n"
+	set expected "Hello World\nSecond Note\n\n"
 	set result [$::listbox get 0.0 end]
 	
 	if {$result != $expected} {
