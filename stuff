@@ -17,8 +17,12 @@ pack [ttk::button .top.new -text "New" -command newNote] -side left
 pack [ttk::button .top.delete -text "Delete" -command deleteNote] -side left
 pack [ttk::button .top.save -text "Save" -command saveStuff] -side left
 
-pack [set listbox [text .bottom.left.list -width 30 -yscrollcommand {$::listscroll set}]] \
-	-side left -fill y
+pack [set listbox [
+	text .bottom.left.list \
+		-width 30 \
+		-yscrollcommand {$::listscroll set} \
+		-cursor arrow
+	]] -side left -fill y
 pack [set listscroll [ttk::scrollbar .bottom.left.scroll -command {$::listbox yview}]] \
 	-side left -fill y
 
