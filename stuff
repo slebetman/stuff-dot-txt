@@ -4,6 +4,18 @@ set searchterm ""
 set stuff {}
 set idx none
 
+if {$tcl_platform(os) == "Darwin"} {
+	set newNoteText "New (⌘N)"
+	set saveNoteText "Save (⌘S)"
+	bind . <Command-n> newNote
+	bind . <Command-s> saveNote
+} else {
+	set newNoteText "New (Ctrl+N)"
+	set saveNoteText "Save (Ctrl+S)"
+	bind . <Control-n> newNote
+	bind . <Control-s> saveNote
+}
+
 pack [ttk::frame .top] -fill x
 pack [ttk::frame .bottom] -fill both -expand true
 pack [ttk::frame .bottom.left] -side left -fill y
@@ -14,9 +26,9 @@ pack [set searchbox [ttk::entry .top.search -textvariable searchterm]] \
 	-side left -fill x -expand true
 bind $searchbox <Escape> {set ::searchterm ""}
 bind $searchbox <KeyRelease> searchStuff
-pack [ttk::button .top.new -text "New" -command newNote] -side left
+pack [ttk::button .top.new -text $newNoteText -command newNote] -side left
 pack [ttk::button .top.delete -text "Delete" -command deleteNote] -side left
-pack [ttk::button .top.save -text "Save" -command saveStuff] -side left
+pack [ttk::button .top.save -text $saveNoteText -command saveStuff] -side left
 
 pack [set listbox [
 	text .bottom.left.list \
