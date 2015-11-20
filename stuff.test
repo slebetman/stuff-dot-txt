@@ -128,7 +128,61 @@ test "Make sure parseStuff works as expected" {
 	assert [list {*}$::stuff] == [list {*}$expected]
 }
 
+test "stuff.txt file may end without separator" {
+set ::txt {test
+________
+First Note
+bla
+________
+Last Note
+mango
+}
+	set dummyFile [chan create read stringReadChan]	
+	parseStuff $dummyFile
+	chan close $dummyFile
+	
+	set expected {
+		{0 test}
+		{1 {{First Note} bla}}
+		{2 {{Last Note} mango}}
+	}
+	assert [list {*}$::stuff] == [list {*}$expected]
+}
+
+test "Ignore empty notes" {
+set ::txt {test
+________
+First Note
+bla
+________
+
+
+________
+Last Note
+mango
+________
+
+
+
+}
+	set dummyFile [chan create read stringReadChan]	
+	parseStuff $dummyFile
+	chan close $dummyFile
+	
+	set expected {
+		{0 test}
+		{1 {{First Note} bla}}
+		{2 {{Last Note} mango}}
+	}
+	assert [list {*}$::stuff] == [list {*}$expected]
+}
+
 test "drawStuff should work with output of parseStuff" {
+	set ::txt $::testFileContent
+	set dummyFile [chan create read stringReadChan]	
+	parseStuff $dummyFile
+	chan close $dummyFile
+	
 	drawStuff
 	set expected "First Note\nSecond Note\nThird Note\n\n"
 	set result [$::listbox get 0.0 end]

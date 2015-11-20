@@ -155,12 +155,17 @@ proc parseStuff {chan} {
 	set note {}
 	while {[gets $chan line] >= 0} {
 		if {[regexp {^____+\s*$} $line]} {
-			lappend stuff [list $i $note]
-			set note {}
-			incr i
+			if {$note != ""} {
+				lappend stuff [list $i $note]
+				set note {}
+				incr i
+			}
 		} elseif {[llength $note] || [regexp {\S} $line]} {
 			lappend note $line
 		}
+	}
+	if {[regexp {\S} $note]} {
+		lappend stuff [list $i $note]
 	}
 }
 
