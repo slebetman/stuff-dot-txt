@@ -190,6 +190,11 @@ test "drawStuff should work with output of parseStuff" {
 }
 
 test "readNote should work with output of parseStuff" {
+	set ::txt $::testFileContent
+	set dummyFile [chan create read stringReadChan]	
+	parseStuff $dummyFile
+	chan close $dummyFile
+	
 	readNote 2
 	set expected "Second Note\n\nbla bla\n"
 	set result [$::notebox get 0.0 end]
@@ -197,7 +202,15 @@ test "readNote should work with output of parseStuff" {
 }
 
 test "Make sure serializeStuff works" {
-	global txt
+	global stuff txt
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
+	
 	set txt ""
 	set dummyFile [chan create write stringWriteChan]
 	serializeStuff $dummyFile
@@ -212,6 +225,15 @@ test "Make sure serializeStuff works" {
 }
 
 test "Make sure newNote works" {
+	global stuff
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
+	
 	readNote 2
 	newNote
 	assert $::idx == none
@@ -221,6 +243,15 @@ test "Make sure newNote works" {
 }
 
 test "Make sure serializeStuff saves modified notes" {
+	global stuff
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
+
 	global txt
 	
 	readNote 1
@@ -242,6 +273,13 @@ test "Make sure serializeStuff saves modified notes" {
 test "Make sure serializeStuff saves new note" {
 	global stuff txt
 	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
+	
 	newNote
 	$::notebox insert end mango
 	$::listbox delete 0.0 end
@@ -252,7 +290,7 @@ test "Make sure serializeStuff saves new note" {
 	chan close $dummyFile
 	set expected [join [list \
 		[join {{Test Stuff File}} \n] \
-		[join {{First Note} bla mango} \n] \
+		[join {{First Note} bla {}} \n] \
 		[join {{Second Note} {} {bla bla}} \n] \
 		[join {{Third Note} {} {bla bla bla}} \n] \
 		[join {{mango}} \n]
@@ -264,19 +302,30 @@ test "Make sure serializeStuff saves new note" {
 
 test "Make sure deleteNote works" {
 	global stuff idx
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
 
-	readNote 4
+	readNote 3
 	deleteNote
 	assert [string trim [$::notebox get 0.0 end]] == ""
 	assert $::idx == "none"
-	assert [lindex $stuff 4 0] == "deleted"
+	assert [lindex $stuff 3 0] == "deleted"
 }
 
 test "Make sure deleteNote redraw notes list correctly" {
-	set ::txt $::testFileContent
-	set dummyFile [chan create read stringReadChan]	
-	parseStuff $dummyFile
-	chan close $dummyFile
+	global stuff
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}
 	
 	readNote 2
 	deleteNote
@@ -287,10 +336,14 @@ test "Make sure deleteNote redraw notes list correctly" {
 }
 
 test "Make sure deleted notes are not serialized" {
-	set ::txt $::testFileContent
-	set dummyFile [chan create read stringReadChan]	
-	parseStuff $dummyFile
-	chan close $dummyFile
+	global stuff
+	
+	set stuff {
+		{0 {{Test Stuff File}}}
+		{1 {{First Note} bla {}}}
+		{2 {{Second Note} {} {bla bla}}}
+		{3 {{Third Note} {} {bla bla bla}}}
+	}	
 	
 	readNote 2
 	deleteNote
