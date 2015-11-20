@@ -167,6 +167,8 @@ proc parseStuff {chan} {
 	if {[regexp {\S} $note]} {
 		lappend stuff [list $i $note]
 	}
+	
+	wm title . [lindex $stuff 0 1 0]
 }
 
 loadStuff
