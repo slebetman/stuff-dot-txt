@@ -8,12 +8,12 @@ if {$tcl_platform(os) == "Darwin"} {
 	set newNoteText "New (⌘N)"
 	set saveNoteText "Save (⌘S)"
 	bind . <Command-n> newNote
-	bind . <Command-s> saveNote
+	bind . <Command-s> saveStuff
 } else {
 	set newNoteText "New (Ctrl+N)"
 	set saveNoteText "Save (Ctrl+S)"
 	bind . <Control-n> newNote
-	bind . <Control-s> saveNote
+	bind . <Control-s> saveStuff
 }
 
 pack [ttk::frame .top] -fill x
