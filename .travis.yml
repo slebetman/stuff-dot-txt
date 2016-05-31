@@ -4,5 +4,6 @@ addons:
   apt:
     packages:
       - tcl
+      - tk
 script:
   - tclsh stuff.test
