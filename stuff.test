@@ -4,6 +4,7 @@ package require Tk
 
 set TESTING 1
 set TERMINAL [expr {![catch {fconfigure stdout -mode}]}]
+set failing 0
 
 proc color {txt c} {
 	if {$::TERMINAL || $::argv == "--color"} {
@@ -16,6 +17,7 @@ proc color {txt c} {
 proc test {description script} {
 	if {[catch $script]} {
 		puts "[color FAIL 1]: $description\n[regsub -lineanchor -all ^ $::errorInfo \t]"
+		incr ::failing
 	} else {
 		puts "[color PASS 2]: $description"
 	}
@@ -381,4 +383,10 @@ test "Make sure searchStuff works" {
 	assert $result == $expected
 }
 
-exit
+if {$failing} {
+	puts [color "$failing tests failed" 1]
+	exit 1
+} else {
+	puts [color "ALL OK" 2]
+	exit 
+}
