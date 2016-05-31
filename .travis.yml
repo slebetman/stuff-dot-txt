@@ -2,7 +2,7 @@ language: c
 sudo: false
 addons:
   apt:
-	packages:
-	  - tcl
+    packages:
+      - tcl
 script:
   - tclsh stuff.test
