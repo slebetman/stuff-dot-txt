@@ -173,4 +173,6 @@ proc parseStuff {chan} {
 	wm title . [lindex $stuff 0 1 0]
 }
 
-loadStuff
+if {!$TESTING} {
+	loadStuff
+}
