@@ -47,13 +47,15 @@ pack [set notebox [text .bottom.right.note \
 pack [set notescroll [ttk::scrollbar .bottom.right.scroll -command {$::notebox yview}]] \
 	-side left -fill y
 
-proc ::tk::mac::ReopenApplication {} {
-	if {[wm state .] eq "withdrawn"} {
-		wm state . normal
-	} else {
-		wm deiconify .
+if {[namespace exists ::tk::mac]} {
+	proc ::tk::mac::ReopenApplication {} {
+		if {[wm state .] eq "withdrawn"} {
+			wm state . normal
+		} else {
+			wm deiconify .
+		}
+		raise .
 	}
-	raise .
 }
 
 proc drawStuff {{select all}} {
