@@ -173,6 +173,6 @@ proc parseStuff {chan} {
 	wm title . [lindex $stuff 0 1 0]
 }
 
-if {!$TESTING} {
+if {![info exists TESTING] || !$TESTING} {
 	loadStuff
 }
